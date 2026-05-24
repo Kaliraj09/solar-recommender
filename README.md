@@ -2,386 +2,561 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Rooftop Solar ROI & Recommendation Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kali Smart Solar - Rooftop Feasibility Engine</title>
     <style>
         :root {
             --primary: #059669;
-            --primary-hover: #047857;
+            --primary-dark: #047857;
             --accent: #d97706;
             --danger: #dc2626;
-            --background: #f0fdf4;
-            --text: #1f2937;
-            --card-bg: #ffffff;
+            --bg-canvas: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-line: #e2e8f0;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-            padding: 20px;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-top: 60px; /* Spacer for fixed mobile header */
         }
 
-        .container {
-            max-width: 1100px;
+        /* Fixed Brand Top Header */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .navbar h1 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hero-banner {
+            text-align: center;
+            padding: 24px 16px;
+            background: linear-gradient(180deg, #ecfdf5 0%, var(--bg-canvas) 100%);
+        }
+
+        .hero-banner h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .hero-banner p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            max-width: 500px;
             margin: 0 auto;
         }
 
-        header {
-            text-align: center;
-            padding: 30px 0;
+        .app-container {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 0 16px 40px 16px;
         }
 
-        header h1 {
-            color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 2.2rem;
-        }
-
-        header p {
-            color: #4b5563;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
+        .mobile-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         @media (min-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr 1.2fr;
+            .mobile-stack {
+                display: grid;
+                grid-template-columns: 1fr 1.1fr;
+                align-items: start;
             }
         }
 
-        .card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            height: fit-content;
+        .ui-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
         }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #111827;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
-            font-size: 1.4rem;
+        .ui-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--bg-canvas);
+            padding-bottom: 8px;
+            color: var(--text-main);
         }
 
-        .form-group {
-            margin-bottom: 18px;
+        .input-group {
+            margin-bottom: 16px;
         }
 
-        label {
+        .input-group label {
             display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 6px;
-            font-weight: 600;
-            color: #374151;
-            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         input, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
+            height: 46px;
+            padding: 0 12px;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            color: var(--text-main);
+            background-color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none; /* Reset standard iOS rounding controls */
+        }
+
+        /* Native dropdown arrow fallback for custom select */
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 32px;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
         }
 
-        button {
+        .action-btn {
             width: 100%;
+            height: 50px;
             background-color: var(--primary);
-            color: white;
-            padding: 14px;
+            color: #fff;
             border: none;
             border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-top: 10px;
         }
 
-        button:hover {
-            background-color: var(--primary-hover);
+        .action-btn:hover, .action-btn:active {
+            background-color: var(--primary-dark);
         }
 
-        .results-hidden {
-            display: none;
-        }
-
-        /* Recommendation Layout Styles */
-        .verdict-box {
-            padding: 18px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
+        /* Output View Structuring */
+        .placeholder-box {
             text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
         }
 
-        .verdict-go { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .verdict-warn { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .verdict-stop { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
-        .metrics-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .hidden {
+            display: none !important;
         }
 
-        .metrics-table th, .metrics-table td {
+        .verdict-tag {
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .go-green { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .go-warn { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .go-stop { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+        .badge-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .data-list {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg-canvas);
+            font-size: 0.95rem;
+        }
+
+        .data-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .data-value {
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: right;
+        }
+
+        .text-green { color: var(--primary) !important; }
+        .text-orange { color: var(--accent) !important; }
+
+        .disclaimer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
             padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-style: italic;
         }
 
-        .metrics-table th {
-            color: #6b7280;
+        /* Modern Footer Section */
+        footer {
+            background-color: #0f172a;
+            color: #94a3b8;
+            padding: 30px 16px;
+            margin-top: 40px;
+            border-top: 4px solid var(--primary);
             font-size: 0.85rem;
+        }
+
+        .footer-content {
+            max-width: 1050px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .footer-section {
+            flex: 1;
+        }
+
+        .footer-section h4 {
+            color: #f8fafc;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .metrics-table td {
-            font-weight: 600;
-            font-size: 1.1rem;
+        .footer-links {
+            list-style: none;
         }
 
-        .highlight-green { color: var(--primary); }
-        .highlight-orange { color: var(--accent); }
-
-        .scheme-badge {
-            background-color: #eff6ff;
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
+        .footer-links li {
+            margin-bottom: 6px;
         }
 
-        .note {
-            font-size: 0.85rem;
-            color: #6b7280;
-            margin-top: 15px;
-            font-style: italic;
-            background: #f3f4f6;
-            padding: 12px;
-            border-radius: 8px;
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+            font-size: 0.8rem;
+            color: #64748b;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>☀️ Smart Solar Consultation Engine</h1>
-        <p>Evaluate financial health, exact government subsidies, real payback timelines, and an instant viability verdict.</p>
-    </header>
+    <!-- Fixed Navbar Header Frame -->
+    <nav class="navbar">
+        <h1>☀️ Kali Smart Solar</h1>
+    </nav>
 
-    <div class="grid">
-        <div class="card">
-            <h2>Property & Power Data</h2>
-            <form id="solarForm">
-                <div class="form-group">
-                    <label for="billCycle">Billing Cycle Frequency</label>
-                    <select id="billCycle" required>
-                        <option value="2" selected>Bi-Monthly (Every 2 Months - e.g., TANGEDCO)</option>
-                        <option value="1">Monthly (Every Month)</option>
-                    </select>
-                </div>
+    <!-- App Dynamic Context Banner -->
+    <section class="hero-banner">
+        <h2>Rooftop ROI Evaluator</h2>
+        <p>Calculate your solar setup capacity, estimated central subsidy framework, and out-of-pocket metrics instantly.</p>
+    </section>
 
-                <div class="form-group">
-                    <label for="billAmount">Average Bill Amount per Cycle (₹)</label>
-                    <input type="number" id="billAmount" placeholder="e.g., 5000" required min="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="electricityRate">Average Unit Slab Rate (₹ per kWh)</label>
-                    <input type="number" id="electricityRate" step="0.1" placeholder="e.g., 8.0" required min="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="roofSpace">Shadow-Free Terrace/Roof Area (sq. ft.)</label>
-                    <input type="number" id="roofSpace" placeholder="e.g., 350" required min="30">
-                </div>
-
-                <div class="form-group">
-                    <label for="region">Geographic Sunlight Multiplier</label>
-                    <select id="region" required>
-                        <option value="5.2">North / West India (High Irradiance - Desert/Plains)</option>
-                        <option value="4.8" selected>South / Central India (Consistent Tropical Sun)</option>
-                        <option value="4.2">East / North-East India (Heavy Monsoon/Cloud Cover)</option>
-                    </select>
-                </div>
-
-                <button type="submit">Analyze Viability & Investment</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h2>Feasibility & Financial Breakdown</h2>
-            <div id="resultsPlaceholder" style="text-align: center; color: #6b7280; padding-top: 100px;">
-                <p>Submit your consumption figures to run structural metrics, net cost mappings, and custom ROI forecasts.</p>
-            </div>
+    <main class="app-container">
+        <div class="mobile-stack">
             
-            <div id="resultsDisplay" class="results-hidden">
-                <div id="verdictBlock" class="verdict-box">
-                    Calculating Verdict...
+            <!-- Inputs Input Area Container -->
+            <div class="ui-card">
+                <h3>Consumer Consumption Metrics</h3>
+                <form id="solarCalculationForm">
+                    <div class="input-group">
+                        <label for="billCycle">Billing Loop Interval</label>
+                        <select id="billCycle" required>
+                            <option value="2" selected>Bi-Monthly (Every 2 Months - e.g., State DISCOMs)</option>
+                            <option value="1">Monthly (Every Month)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="billAmount">Avg Bill Cost per Cycle (₹)</label>
+                        <input type="number" id="billAmount" placeholder="e.g., 6000" required min="1" inputmode="numeric">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="unitRate">Avg Tariff Cost (₹ per unit/kWh)</label>
+                        <input type="number" id="unitRate" step="0.05" placeholder="e.g., 8.2" required min="1" inputmode="decimal">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="roofSpace">Clear Shadow-Free Terrace Area (sq. ft.)</label>
+                        <input type="number" id="roofSpace" placeholder="e.g., 400" required min="20" inputmode="numeric">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="sunZone">Regional Sun Radiation Level</label>
+                        <select id="sunZone" required>
+                            <option value="5.2">North / West India (High Irradiance)</option>
+                            <option value="4.8" selected>South / Central India (Consistent Tropical Sun)</option>
+                            <option value="4.2">East / North-East India (Cloud Overcast Risk)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="action-btn">Compute Plant Layout</button>
+                </form>
+            </div>
+
+            <!-- Operational Engineering Metrics View -->
+            <div class="ui-card">
+                <h3>Analysis Results</h3>
+                
+                <div id="uiPlaceholder" class="placeholder-box">
+                    <p>Provide your residential billing particulars to load capacity dimensions, PM Surya Ghar central subsidies, and exact amortization loops.</p>
                 </div>
 
-                <div class="scheme-badge">
-                    <strong>📢 Central Scheme Connected:</strong> Subsidies are automatically calculated dynamically based on the current 2026 <em>PM Surya Ghar: Muft Bijli Yojana</em> structural models.
-                </div>
+                <div id="uiResultDashboard" class="hidden">
+                    <div id="verdictBadge" class="verdict-tag">Evaluating...</div>
+                    
+                    <div class="badge-info">
+                        <strong>Live Portal Sync:</strong> Computations factor in current 2026 Direct Benefit Transfer (DBT) subsidy calculations safely.
+                    </div>
 
-                <table class="metrics-table">
-                    <thead>
-                        <tr><th colspan="2">System & Space Architecture</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Suggested Capacity</td><td id="cellCapacity" class="highlight-green">0.0 kWp</td></tr>
-                        <tr><td>Required Panel Fleet</td><td id="cellPanels">0 Panels</td></tr>
-                        <tr><td>Physical Area Check</td><td id="cellSpace">Checking Area...</td></tr>
-                    </tbody>
-                </table>
+                    <ul class="data-list">
+                        <li class="data-row">
+                            <span class="data-label">Recommended Capacity</span>
+                            <span id="outSize" class="data-value text-green">0.00 kWp</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Total Panels (540Wp Mono)</span>
+                            <span id="outPanels" class="data-value">0 Modules</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Terrace Space Viability</span>
+                            <span id="outSpace" class="data-value">Checking...</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Gross Installation Cost</span>
+                            <span id="outGross" class="data-value">₹0</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">PM Surya Ghar Subsidy</span>
+                            <span id="outSubsidy" class="data-value text-green">- ₹0</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Net Investment (Out-of-Pocket)</span>
+                            <span id="outNet" class="data-value">₹0</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Monthly Production Capability</span>
+                            <span id="outProduction" class="data-value text-green">0 Units</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Amortization Payback Duration</span>
+                            <span id="outPayback" class="data-value text-orange">0.0 Years</span>
+                        </li>
+                        <li class="data-row">
+                            <span class="data-label">Estimated 25-Year Net Yield</span>
+                            <span id="outSavings" class="data-value text-green">₹0</span>
+                        </li>
+                    </ul>
 
-                <table class="metrics-table">
-                    <thead>
-                        <tr><th colspan="2">Financial Viability Metrics (₹)</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Est. Gross Market Cost</td><td id="cellGrossCost">₹0</td></tr>
-                        <tr><td>Govt. Subsidy (DBT Credit)</td><td id="cellSubsidy" class="highlight-green">- ₹0</td></tr>
-                        <tr><td><strong>Your Net Investment</strong></td><td id="cellNetCost"><strong>₹0</strong></td></tr>
-                        <tr><td>Estimated Annual Savings</td><td id="cellAnnualSavings" class="highlight-green">₹0 / year</td></tr>
-                        <tr><td><strong>Payback Period</strong></td><td id="cellPayback" class="highlight-orange">0 Years</td></tr>
-                        <tr><td>Net 25-Year Life Savings</td><td id="cellLifeSavings" class="highlight-green">₹0</td></tr>
-                    </tbody>
-                </table>
-
-                <div class="note">
-                    <strong>Strategic Investment Logic:</strong> Residential systems hold an architecture lifetime of 25 years. If your custom payback timeline clocks under 5 years, transitioning to clean rooftop generation functions mathematically better than a standard fixed deposit.
+                    <div class="disclaimer">
+                        <strong>Disclaimer:</strong> Structural engineering requires clean roof alignments. Calculated metrics follow standard domestic de-rating scales (approx 20% conversion safety variance).
+                    </div>
                 </div>
             </div>
+
         </div>
-    </div>
-</div>
+    </main>
 
-<script>
-    document.getElementById('solarForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    <!-- Professional Corporate Footer Section -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Kali Smart Solar</h4>
+                <p>Architecting digital validation tools for decentralized green clean grid configurations inside India.</p>
+            </div>
+            <div class="footer-section" style="margin-top: 15px; margin-top: 0; min-width: 200px;">
+                <h4>Scheme Assets</h4>
+                <ul class="footer-links">
+                    <li><a href="https://pmsuryaghar.gov.in/" target="_blank" rel="noreferrer">National Portal Official URL</a></li>
+                    <li><a href="#">MNRE DCR Compliance Guidelines</a></li>
+                    <li><a href="#">DISCOM Net-Metering Benchmarks</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Kali Smart Solar Engine. Built with precision for sustainable consumer engineering. All rights reserved.
+        </div>
+    </footer>
 
-        // 1. Inputs Acquisition
-        const billCycle = parseInt(document.getElementById('billCycle').value);
-        const billAmount = parseFloat(document.getElementById('billAmount').value);
-        const rate = parseFloat(document.getElementById('electricityRate').value);
-        const roofSpace = parseFloat(document.getElementById('roofSpace').value);
-        const sunHours = parseFloat(document.getElementById('region').value);
+    <script>
+        document.getElementById('solarCalculationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        // 2. Technical Conversion Calculations
-        const totalUnitsPerCycle = billAmount / rate;
-        const monthlyUnitsConsumed = billCycle === 2 ? (totalUnitsPerCycle / 2) : totalUnitsPerCycle;
-        const dailyUnitsTarget = monthlyUnitsConsumed / 30;
-        
-        // System Capacity requirement calculation factoring safety engineering variables (15% plant dropout)
-        let neededKw = (dailyUnitsTarget / sunHours) * 1.15;
-        if (neededKw < 1) neededKw = 1; // Base micro floor
+            // 1. Data Extractor Logic
+            const cycleFactor = parseInt(document.getElementById('billCycle').value);
+            const rawBill = parseFloat(document.getElementById('billAmount').value);
+            const electricityPrice = parseFloat(document.getElementById('unitRate').value);
+            const clearRoofArea = parseFloat(document.getElementById('roofSpace').value);
+            const regionSolarYield = parseFloat(document.getElementById('sunZone').value);
 
-        // Scale against high efficiency modern 540Wp modules (0.54 kWp per module)
-        const panelPowerKw = 0.54;
-        let panelsCount = Math.ceil(neededKw / panelPowerKw);
-        const targetedPlantCapacity = panelsCount * panelPowerKw;
+            // 2. Functional Conversion Computations
+            const consumerUnitsPerCycle = rawBill / electricityPrice;
+            const normalizedMonthlyConsumptionUnits = cycleFactor === 2 ? (consumerUnitsPerCycle / 2) : consumerUnitsPerCycle;
+            const targetDailyGenerationUnits = normalizedMonthlyConsumptionUnits / 30;
 
-        // Space Engineering Metrics: Standard Indian installations require ~90 sq.ft per kWp for safe structural clearance
-        const structuralSpaceRequired = targetedPlantCapacity * 90;
-        let areaFeasible = roofSpace >= structuralSpaceRequired;
+            // Theoretical plant design parameters (with a 15% inline processing loss buffer)
+            let recommendedKwSize = (targetDailyGenerationUnits / regionSolarYield) * 1.15;
+            if(recommendedKwSize < 1) recommendedKwSize = 1.0; // Floor safety setup baseline
 
-        // 3. Financial Engineering Framework (2026 Market Rates)
-        // Average benchmark setup rate for high grade structural engineering in India: ₹55,000 per kWp gross
-        const grossInvestmentCost = Math.round(targetedPlantCapacity * 55000);
+            // Sizing structure using current high grade 540Wp Mono PERC modules
+            const modernModulePowerKw = 0.54;
+            let neededModuleUnitsCount = Math.ceil(recommendedKwSize / modernModulePowerKw);
+            const optimizedFinalPlantCapacityKw = neededModuleUnitsCount * modernModulePowerKw;
 
-        // Official PM Surya Ghar Subsidy Engine Mechanics
-        let calculatedSubsidy = 0;
-        if (targetedPlantCapacity <= 2) {
-            calculatedSubsidy = Math.round(targetedPlantCapacity * 30000);
-        } else if (targetedPlantCapacity > 2 && targetedPlantCapacity <= 3) {
-            calculatedSubsidy = 60000 + Math.round((targetedPlantCapacity - 2) * 18000);
-        } else {
-            calculatedSubsidy = 78000; // Hard national ceiling for systems above 3kWp
-        }
+            // Space Assessment: Indian arrays need roughly 90 sq. ft clear zone per kW for cleaning paths & tilt clearance
+            const thresholdTerraceSpaceDemanded = optimizedFinalPlantCapacityKw * 90;
+            const structuralSpaceIsViable = clearRoofArea >= thresholdTerraceSpaceDemanded;
 
-        const netOutofPocketCost = grossInvestmentCost - calculatedSubsidy;
+            // 3. Financial Engineering Framework Matrix (2026 Averages)
+            const benchmarkGrossCostPerKw = 55000;
+            const calculatedGrossCostVal = Math.round(optimizedFinalPlantCapacityKw * benchmarkGrossCostPerKw);
 
-        // Savings & Amortization Yield Forecasts
-        const environmentalDeratingFactor = 0.80; // Accounting for seasonal clouds, local dust, wiring drops
-        const monthlyGenerationUnits = targetedPlantCapacity * sunHours * 30 * environmentalDeratingFactor;
-        
-        // Ensure household savings don't exceed their true ongoing utility expense capacity
-        const offsetUnitsMonthly = Math.min(monthlyUnitsConsumed, monthlyGenerationUnits);
-        const monthlySavingsCash = offsetUnitsMonthly * rate;
-        const yearlySavingsCash = monthlySavingsCash * 12;
+            // PM Surya Ghar Scheme Tier Mechanics (₹30K/kW for up to 2kW, ₹18K for 3rd kW, Max capped at ₹78K)
+            let subsidyDistributionPayable = 0;
+            if(optimizedFinalPlantCapacityKw <= 2.0) {
+                subsidyDistributionPayable = Math.round(optimizedFinalPlantCapacityKw * 30000);
+            } else if(optimizedFinalPlantCapacityKw > 2.0 && optimizedFinalPlantCapacityKw <= 3.0) {
+                subsidyDistributionPayable = 60000 + Math.round((optimizedFinalPlantCapacityKw - 2.0) * 18000);
+            } else {
+                subsidyDistributionPayable = 78000;
+            }
 
-        const paybackTimelineYears = netOutofPocketCost / yearlySavingsCash;
-        const lifetimeTotalSavings = (yearlySavingsCash * 25) - netOutofPocketCost;
+            const netCustomerCapitalOutlay = calculatedGrossCostVal - subsidyDistributionPayable;
 
-        // 4. Automated Verdict Evaluation Engine
-        const verdictElement = document.getElementById('verdictBlock');
-        verdictElement.className = "verdict-box"; // reset styles
+            // Generation and Amortization Calculation Profiles
+            const standardDeratingDeclineCoefficient = 0.82; // Environmental dust drop factor
+            const calculatedMonthlyUnitsOutput = optimizedFinalPlantCapacityKw * regionSolarYield * 30 * standardDeratingDeclineCoefficient;
+            
+            const realBillOffsetUnits = Math.min(normalizedMonthlyConsumptionUnits, calculatedMonthlyUnitsOutput);
+            const estimatedCashSavingsMonthly = realBillOffsetUnits * electricityPrice;
+            const estimatedCashSavingsYearly = estimatedCashSavingsMonthly * 12;
 
-        if (!areaFeasible) {
-            verdictElement.innerText = "❌ STRONGLY NOT RECOMMENDED: Insufficient Space";
-            verdictElement.classList.add("verdict-stop");
-        } else if (monthlyUnitsConsumed < 120) {
-            verdictElement.innerText = "⚠️ MARGINAL BENEFIT: Your Current Bill is Too Low to Justify Setup Costs";
-            verdictElement.classList.add("verdict-warn");
-        } else if (paybackTimelineYears <= 4.5) {
-            verdictElement.innerText = "✅ HIGHLY RECOMMENDED: Phenomenal Returns & Fast Payback Financial Loop!";
-            verdictElement.classList.add("verdict-go");
-        } else {
-            verdictElement.innerText = "✅ VIABLE INVESTMENT: Highly Profitable Long-Term Financial Option.";
-            verdictElement.classList.add("verdict-go");
-        }
+            const finalPaybackDurationVal = netCustomerCapitalOutlay / estimatedCashSavingsYearly;
+            const lifetimeAccumulatedNetYield = (estimatedCashSavingsYearly * 25) - netCustomerCapitalOutlay;
 
-        // 5. Data Rendering to View Elements
-        document.getElementById('cellCapacity').innerText = `${targetedPlantCapacity.toFixed(2)} kWp`;
-        document.getElementById('cellPanels').innerText = `${panelsCount} Units (540Wp Mono-PERC Half-Cut)`;
-        
-        document.getElementById('cellSpace').innerText = areaFeasible 
-            ? `✅ Safe (Needs ~${Math.round(structuralSpaceRequired)} sq. ft.)` 
-            : `❌ Shortfall (Needs ~${Math.round(structuralSpaceRequired)} sq. ft.)`;
-        if(!areaFeasible) document.getElementById('cellSpace').style.color = 'var(--danger)';
-        else document.getElementById('cellSpace').style.color = 'var(--text)';
+            // 4. Output Render Engine Block Execution
+            const verdictNode = document.getElementById('verdictBadge');
+            verdictNode.className = "verdict-tag"; 
 
-        document.getElementById('cellGrossCost').innerText = `₹${grossInvestmentCost.toLocaleString('en-IN')}`;
-        document.getElementById('cellSubsidy').innerText = `- ₹${calculatedSubsidy.toLocaleString('en-IN')}`;
-        document.getElementById('cellNetCost').innerText = `₹${netOutofPocketCost.toLocaleString('en-IN')}`;
-        document.getElementById('cellAnnualSavings').innerText = `₹${Math.round(yearlySavingsCash).toLocaleString('en-IN')} / year`;
-        
-        document.getElementById('cellPayback').innerText = `${paybackTimelineYears.toFixed(1)} Years`;
-        document.getElementById('cellLifeSavings').innerText = `₹${Math.round(lifetimeTotalSavings).toLocaleString('en-IN')} across 25 Yrs`;
+            if(!structuralSpaceIsViable) {
+                verdictNode.innerText = "❌ INSUFFICIENT ROOF SURFACE SPACE";
+                verdictNode.classList.add("go-stop");
+            } else if(normalizedMonthlyConsumptionUnits < 130) {
+                verdictNode.innerText = "⚠️ LOW CONSUMPTION: MARGINAL MONTHLY SAVINGS";
+                verdictNode.classList.add("go-warn");
+            } else if(finalPaybackDurationVal <= 4.2) {
+                verdictNode.innerText = "✅ HIGHLY BENEFICIAL: FANTASTIC FAST INVESTMENT YIELD";
+                verdictNode.classList.add("go-green");
+            } else {
+                verdictNode.innerText = "✅ STABLE & PROFITABLE RESIDENTIAL VIABILITY";
+                verdictNode.classList.add("go-green");
+            }
 
-        // UI Reveal Execution Toggle
-        document.getElementById('resultsPlaceholder').style.display = 'none';
-        document.getElementById('resultsDisplay').classList.remove('results-hidden');
-    });
-</script>
+            // 5. Data View Interpolations
+            document.getElementById('outSize').innerText = `${optimizedFinalPlantCapacityKw.toFixed(2)} kWp`;
+            document.getElementById('outPanels').innerText = `${neededModuleUnitsCount} Panels (540Wp Mono PERC)`;
+            
+            const spaceTargetNode = document.getElementById('outSpace');
+            if(structuralSpaceIsViable) {
+                spaceTargetNode.innerText = `✅ Feasible (Needs ~${Math.round(thresholdTerraceSpaceDemanded)} sq. ft.)`;
+                spaceTargetNode.style.color = "var(--primary)";
+            } else {
+                spaceTargetNode.innerText = `❌ Shortfall (Needs ~${Math.round(thresholdTerraceSpaceDemanded)} sq. ft.)`;
+                spaceTargetNode.style.color = "var(--danger)";
+            }
 
+            document.getElementById('outGross').innerText = `₹${calculatedGrossCostVal.toLocaleString('en-IN')}`;
+            document.getElementById('outSubsidy').innerText = `- ₹${subsidyDistributionPayable.toLocaleString('en-IN')}`;
+            document.getElementById('outNet').innerText = `₹${netCustomerCapitalOutlay.toLocaleString('en-IN')}`;
+            document.getElementById('outProduction').innerText = `${Math.round(calculatedMonthlyUnitsOutput)} Units / Month`;
+            document.getElementById('outPayback').innerText = `${finalPaybackDurationVal.toFixed(1)} Years`;
+            document.getElementById('outSavings').innerText = `₹${Math.round(lifetimeAccumulatedNetYield).toLocaleString('en-IN')} (25 Yrs)`;
+
+            // Screen View State Switcher Execution
+            document.getElementById('uiPlaceholder').style.display = 'none';
+            document.getElementById('uiResultDashboard').classList.remove('hidden');
+            
+            // Auto smooth scroll to tracking grid layout view on thin screens
+            if(window.innerWidth < 768) {
+                document.getElementById('uiResultDashboard').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
 </body>
 </html>
